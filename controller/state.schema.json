@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/JennyJoshua/github-ai-workforce/blob/main/controller/state.schema.json",
+  "title": "AI Workforce Task Checkpoint",
+  "description": "Fail-closed checkpoint format. Engine availability is never inferred from a checkpoint.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "task_id",
+    "project_name",
+    "handover_url",
+    "status",
+    "required_engine",
+    "last_completed_step",
+    "next_step",
+    "branch",
+    "changed_files",
+    "commit_sha",
+    "pull_request_url",
+    "checks",
+    "blockers",
+    "wait_condition",
+    "availability_evidence",
+    "approvals_required",
+    "updated_at"
+  ],
+  "properties": {
+    "schema_version": { "type": "integer", "enum": [1] },
+    "task_id": { "type": "string", "minLength": 1 },
+    "project_name": { "type": "string", "minLength": 1 },
+    "handover_url": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
+    "status": {
+      "type": "string",
+      "enum": [
+        "new",
+        "in_progress",
+        "paused_usage_reset",
+        "blocked_engine_unavailable",
+        "blocked_decision_needed",
+        "ready_for_chatgpt_review",
+        "done"
+      ]
+    },
+    "required_engine": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "model"],
+      "properties": {
+        "provider": { "type": "string", "enum": ["chatgpt", "claude"] },
+        "model": { "type": "string", "minLength": 1 }
+      }
+    },
+    "last_completed_step": { "type": "string", "minLength": 1 },
+    "next_step": { "type": "string", "minLength": 1 },
+    "branch": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
+    "changed_files": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "commit_sha": { "anyOf": [{ "type": "string", "pattern": "^[0-9a-f]{40}$" }, { "type": "null" }] },
+    "pull_request_url": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "result", "evidence"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "result": { "type": "string", "enum": ["passed", "failed", "blocked", "not_run"] },
+          "evidence": { "type": "string", "minLength": 1 }
+        }
+      }
+    },
+    "blockers": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "wait_condition": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
+    "availability_evidence": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
+    "approvals_required": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "updated_at": { "type": "string", "format": "date-time" }
+  }
+}

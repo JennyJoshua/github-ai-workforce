@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "task_id": "workforce-controller-state-v1",
+  "project_name": "GitHub AI Workforce Controller",
+  "handover_url": "https://app.notion.com/p/400b970f50cd81c698e7f618a9b6ac80",
+  "status": "in_progress",
+  "required_engine": {
+    "provider": "chatgpt",
+    "model": "GPT-6"
+  },
+  "last_completed_step": "Reviewed existing workflow specification and PR dependencies",
+  "next_step": "Implement and test the manual-dispatch controller",
+  "branch": "feat/controller-state-checkpoint-schema",
+  "changed_files": [
+    "controller/state.schema.json",
+    "controller/validate_state.py",
+    "controller/tests/test_validate_state.py",
+    "controller/state.example.json"
+  ],
+  "commit_sha": null,
+  "pull_request_url": null,
+  "checks": [
+    {
+      "name": "Schema and validator unit tests",
+      "result": "not_run",
+      "evidence": "Pending GitHub Actions result"
+    }
+  ],
+  "blockers": [],
+  "wait_condition": null,
+  "availability_evidence": null,
+  "approvals_required": [],
+  "updated_at": "2026-10-24T00:00:00Z"
+}
