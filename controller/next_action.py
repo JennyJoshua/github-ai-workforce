@@ -121,6 +121,7 @@ def main(argv: list[str] | None = None) -> int:
         f"- **Required engine/model:** {state['required_engine']['provider']} / "
         f"{state['required_engine']['model']}\n"
         f"- **Recorded next step:** {state['next_step']}\n\n"
+        f"{decision_lines}"
         f"**Recommended safe action:** {recommendation}\n\n"
         "This is a manual decision aid only. It does not execute an agent, verify "
         "private usage limits, infer approval, or confirm provider availability.\n"
