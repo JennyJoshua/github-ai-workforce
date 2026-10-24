@@ -15,6 +15,20 @@ from typing import Any
 from validate_state import DEFAULT_SCHEMA, validate_state
 
 ACTIONS = {
+    "awaiting_user_decision": (
+        "STOP: Present the recorded question and options to the user. Wait for an explicit "
+        "decision to be recorded; do not proceed because of silence or a page view."
+    ),
+    "awaiting_user_approval": (
+        "STOP: Obtain and record the user's explicit approval or rejection before continuing."
+    ),
+    "ready_for_user_trigger": (
+        "WAIT: The user must explicitly trigger the next step. Do not start work automatically."
+    ),
+    "blocked": (
+        "REMAIN BLOCKED: Inspect the recorded blocker and request a decision or fix. "
+        "Do not guess or bypass the blocker."
+    ),
     "new": (
         "STOP: Review the handover and confirm scope, required engine/model, "
         "and approvals before starting. This controller cannot infer approval."
@@ -89,6 +103,16 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     recommendation = recommend_next_action(state)
+    decision = state["decision"]
+    decision_lines = ""
+    if decision["question"]:
+        decision_lines = (
+            f"- **Decision question:** {decision['question']}\\n"
+            f"- **Options:** {', '.join(decision['options']) if decision['options'] else 'Not specified'}\\n"
+            f"- **Recommendation:** {decision['recommendation'] or 'None recorded'}\\n"
+            f"- **Requested at:** {decision['requested_at'] or 'Not recorded'}\\n"
+            f"- **Decision record:** {decision['decision_record'] or 'No explicit decision recorded'}\\n\\n"
+        )
     report = (
         "# Controller checkpoint review\n\n"
         f"- **Task:** {state['task_id']}\n"
