@@ -34,6 +34,14 @@ class NextActionTests(unittest.TestCase):
         ):
             with self.subTest(status=status):
                 state = {**EXAMPLE, "status": status}
+                if status in {"awaiting_user_decision", "awaiting_user_approval", "ready_for_user_trigger"}:
+                    state["decision"] = {
+                        "question": "What should happen next?",
+                        "options": ["Approve", "Reject"],
+                        "recommendation": "Approve the bounded batch",
+                        "requested_at": "2026-10-24T07:00:00Z",
+                        "decision_record": None
+                    }
                 self.assertEqual(validate_state(state, SCHEMA), [])
                 self.assertTrue(recommend_next_action(state))
 
