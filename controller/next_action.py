@@ -52,9 +52,10 @@ def recommend_next_action(state: dict[str, Any]) -> str:
     return ACTIONS[state["status"]]
 
 
-def load_and_validate(checkpoint_path: Path, repo_root: Path, schema_path: Path = DEFAULT_SCHEMA) -> dict[str, Any]:
+def load_and_validate(checkpoint_path: str | Path, repo_root: Path, schema_path: Path = DEFAULT_SCHEMA) -> dict[str, Any]:
     """Read a repository-local checkpoint and fail closed on invalid input."""
     root = repo_root.resolve()
+    checkpoint_path = Path(checkpoint_path)
     candidate = checkpoint_path if checkpoint_path.is_absolute() else root / checkpoint_path
     candidate = candidate.resolve()
     try:
