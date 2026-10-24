@@ -57,6 +57,23 @@ class CheckpointValidationTests(unittest.TestCase):
         state = {**EXAMPLE, "schema_version": True}
         self.assertTrue(any("$.schema_version: expected integer" in e for e in validate_state(state, SCHEMA)))
 
+    def test_awaiting_decision_requires_question_options_and_timestamp(self):
+        state = {**EXAMPLE, "status": "awaiting_user_decision"}
+        errors = validate_state(state, SCHEMA)
+        self.assertTrue(any("$.decision.question" in e for e in errors))
+        self.assertTrue(any("$.decision.options" in e for e in errors))
+        self.assertTrue(any("$.decision.requested_at" in e for e in errors))
+
+    def test_awaiting_decision_with_explicit_prompt_is_valid(self):
+        state = {**EXAMPLE, "status": "awaiting_user_decision", "decision": {
+            "question": "Approve the proposed next batch?",
+            "options": ["Approve", "Reject"],
+            "recommendation": "Approve the bounded test-only batch",
+            "requested_at": "2026-10-24T07:00:00Z",
+            "decision_record": None
+        }}
+        self.assertEqual(validate_state(state, SCHEMA), [])
+
 
 if __name__ == "__main__":
     unittest.main()
