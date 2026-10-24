@@ -21,6 +21,10 @@ class NextActionTests(unittest.TestCase):
     def test_every_known_status_has_a_conservative_recommendation(self):
         for status in (
             "new",
+            "awaiting_user_decision",
+            "awaiting_user_approval",
+            "ready_for_user_trigger",
+            "blocked",
             "in_progress",
             "paused_usage_reset",
             "blocked_engine_unavailable",
@@ -32,6 +36,17 @@ class NextActionTests(unittest.TestCase):
                 state = {**EXAMPLE, "status": status}
                 self.assertEqual(validate_state(state, SCHEMA), [])
                 self.assertTrue(recommend_next_action(state))
+
+    def test_awaiting_decision_never_recommends_progress(self):
+        state = {**EXAMPLE, "status": "awaiting_user_decision"}
+        message = recommend_next_action(state).lower()
+        self.assertIn("stop", message)
+        self.assertIn("explicit decision", message)
+        self.assertIn("silence", message)
+
+    def test_ready_for_user_trigger_waits_for_user(self):
+        state = {**EXAMPLE, "status": "ready_for_user_trigger"}
+        self.assertIn("user must explicitly trigger", recommend_next_action(state).lower())
 
     def test_unavailable_engine_does_not_recommend_fallback(self):
         state = {**EXAMPLE, "status": "blocked_engine_unavailable"}
