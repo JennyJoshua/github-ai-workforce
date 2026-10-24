@@ -59,6 +59,10 @@ class NextActionTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "inside the checked-out repository"):
                 load_and_validate(outside, root)
 
+    def test_string_checkpoint_path_is_accepted(self):
+        state = load_and_validate("controller/state.example.json", Path.cwd())
+        self.assertEqual(state["task_id"], EXAMPLE["task_id"])
+
     def test_invalid_checkpoint_is_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
