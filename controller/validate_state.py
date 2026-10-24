@@ -77,6 +77,8 @@ def _validate(value: Any, schema: dict[str, Any], path: str = "$") -> list[str]:
                 errors.extend(_validate(value[key], child, f"{path}.{key}"))
 
     if isinstance(value, list):
+        if len(value) < schema.get("minItems", 0):
+            errors.append(f"{path}: array has fewer than {schema.get('minItems')} items")
         for index, item in enumerate(value):
             errors.extend(_validate(item, schema.get("items", {}), f"{path}[{index}]"))
 
@@ -85,7 +87,21 @@ def _validate(value: Any, schema: dict[str, Any], path: str = "$") -> list[str]:
 
 def validate_state(state: Any, schema: dict[str, Any]) -> list[str]:
     """Return validation errors; an empty list means the checkpoint is valid."""
-    return _validate(state, schema)
+    errors = _validate(state, schema)
+    if isinstance(state, dict) and state.get("status") in {
+        "awaiting_user_decision", "awaiting_user_approval", "ready_for_user_trigger"
+    }:
+        decision = state.get("decision")
+        if not isinstance(decision, dict):
+            errors.append("$.decision: decision details are required while awaiting user input")
+        else:
+            if not isinstance(decision.get("question"), str) or not decision["question"].strip():
+                errors.append("$.decision.question: a specific question is required while awaiting user input")
+            if not isinstance(decision.get("options"), list) or not decision["options"]:
+                errors.append("$.decision.options: at least one option or explicit response instruction is required")
+            if not isinstance(decision.get("requested_at"), str) or not decision["requested_at"].strip():
+                errors.append("$.decision.requested_at: request timestamp is required while awaiting user input")
+    return errors
 
 
 def main(argv: list[str] | None = None) -> int:
