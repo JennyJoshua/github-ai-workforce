@@ -23,18 +23,44 @@
     "wait_condition",
     "availability_evidence",
     "approvals_required",
-    "updated_at"
+    "updated_at",
+    "decision"
   ],
   "properties": {
-    "schema_version": { "type": "integer", "enum": [1] },
-    "task_id": { "type": "string", "minLength": 1 },
-    "project_name": { "type": "string", "minLength": 1 },
-    "handover_url": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
+    "schema_version": {
+      "type": "integer",
+      "enum": [
+        1
+      ]
+    },
+    "task_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "project_name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "handover_url": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
     "status": {
       "type": "string",
       "enum": [
         "new",
         "in_progress",
+        "awaiting_user_decision",
+        "awaiting_user_approval",
+        "ready_for_user_trigger",
+        "blocked",
         "paused_usage_reset",
         "blocked_engine_unavailable",
         "blocked_decision_needed",
@@ -45,35 +71,225 @@
     "required_engine": {
       "type": "object",
       "additionalProperties": false,
-      "required": ["provider", "model"],
+      "required": [
+        "provider",
+        "model"
+      ],
       "properties": {
-        "provider": { "type": "string", "enum": ["chatgpt", "claude"] },
-        "model": { "type": "string", "minLength": 1 }
+        "provider": {
+          "type": "string",
+          "enum": [
+            "chatgpt",
+            "claude"
+          ]
+        },
+        "model": {
+          "type": "string",
+          "minLength": 1
+        }
       }
     },
-    "last_completed_step": { "type": "string", "minLength": 1 },
-    "next_step": { "type": "string", "minLength": 1 },
-    "branch": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
-    "changed_files": { "type": "array", "items": { "type": "string", "minLength": 1 } },
-    "commit_sha": { "anyOf": [{ "type": "string", "pattern": "^[0-9a-f]{40}$" }, { "type": "null" }] },
-    "pull_request_url": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
+    "last_completed_step": {
+      "type": "string",
+      "minLength": 1
+    },
+    "next_step": {
+      "type": "string",
+      "minLength": 1
+    },
+    "branch": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "changed_files": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "commit_sha": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "pull_request_url": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
     "checks": {
       "type": "array",
       "items": {
         "type": "object",
         "additionalProperties": false,
-        "required": ["name", "result", "evidence"],
+        "required": [
+          "name",
+          "result",
+          "evidence"
+        ],
         "properties": {
-          "name": { "type": "string", "minLength": 1 },
-          "result": { "type": "string", "enum": ["passed", "failed", "blocked", "not_run"] },
-          "evidence": { "type": "string", "minLength": 1 }
+          "name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "result": {
+            "type": "string",
+            "enum": [
+              "passed",
+              "failed",
+              "blocked",
+              "not_run"
+            ]
+          },
+          "evidence": {
+            "type": "string",
+            "minLength": 1
+          }
         }
       }
     },
-    "blockers": { "type": "array", "items": { "type": "string", "minLength": 1 } },
-    "wait_condition": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
-    "availability_evidence": { "anyOf": [{ "type": "string", "minLength": 1 }, { "type": "null" }] },
-    "approvals_required": { "type": "array", "items": { "type": "string", "minLength": 1 } },
-    "updated_at": { "type": "string", "format": "date-time" }
+    "blockers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "wait_condition": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "availability_evidence": {
+      "anyOf": [
+        {
+          "type": "string",
+          "minLength": 1
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "approvals_required": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "question",
+        "options",
+        "recommendation",
+        "requested_at",
+        "decision_record"
+      ],
+      "properties": {
+        "question": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "options": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "recommendation": {
+          "anyOf": [
+            {
+              "type": "string",
+              "minLength": 1
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "requested_at": {
+          "anyOf": [
+            {
+              "type": "string",
+              "format": "date-time"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "decision_record": {
+          "anyOf": [
+            {
+              "type": "null"
+            },
+            {
+              "type": "object",
+              "additionalProperties": false,
+              "required": [
+                "choice",
+                "decided_at",
+                "decision_owner"
+              ],
+              "properties": {
+                "choice": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "decided_at": {
+                  "type": "string",
+                  "format": "date-time"
+                },
+                "decision_owner": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
   }
 }

@@ -30,5 +30,12 @@
   "wait_condition": null,
   "availability_evidence": null,
   "approvals_required": [],
-  "updated_at": "2026-10-24T00:00:00Z"
+  "updated_at": "2026-10-24T00:00:00Z",
+  "decision": {
+    "question": null,
+    "options": [],
+    "recommendation": null,
+    "requested_at": null,
+    "decision_record": null
+  }
 }
