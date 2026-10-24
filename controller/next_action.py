@@ -107,11 +107,11 @@ def main(argv: list[str] | None = None) -> int:
     decision_lines = ""
     if decision["question"]:
         decision_lines = (
-            f"- **Decision question:** {decision['question']}\\n"
-            f"- **Options:** {', '.join(decision['options']) if decision['options'] else 'Not specified'}\\n"
-            f"- **Recommendation:** {decision['recommendation'] or 'None recorded'}\\n"
-            f"- **Requested at:** {decision['requested_at'] or 'Not recorded'}\\n"
-            f"- **Decision record:** {decision['decision_record'] or 'No explicit decision recorded'}\\n\\n"
+            f"- **Decision question:** {decision['question']}\n"
+            f"- **Options:** {', '.join(decision['options']) if decision['options'] else 'Not specified'}\n"
+            f"- **Recommendation:** {decision['recommendation'] or 'None recorded'}\n"
+            f"- **Requested at:** {decision['requested_at'] or 'Not recorded'}\n"
+            f"- **Decision record:** {decision['decision_record'] or 'No explicit decision recorded'}\n\n"
         )
     report = (
         "# Controller checkpoint review\n\n"
